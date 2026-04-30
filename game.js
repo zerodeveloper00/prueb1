@@ -23,7 +23,7 @@ window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('touchmove', (e) => {
         mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY;
         if (aura) { aura.style.left = `${mouse.x}px`; aura.style.top = `${mouse.y}px`; }
-    });
+    }, { passive: true }); // Permite que el scroll móvil sea 100% fluido
 });
 
 class Particle {
@@ -83,7 +83,8 @@ class Particle {
 function initParticles() {
     if (!canvas) return;
     particles = [];
-    let numParticles = window.innerWidth < 768 ? 50 : 100;
+    // Optimización de CPU/Batería en Android: reducimos partículas en pantallas pequeñas
+    let numParticles = window.innerWidth < 768 ? 30 : 100;
     for (let i = 0; i < numParticles; i++) particles.push(new Particle());
 }
 
