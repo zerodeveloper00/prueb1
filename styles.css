@@ -1,9 +1,9 @@
 :root {
-    --bg-dark: #020611;
-    --zafiro-deep: #0A192F;
-    --cyan-electric: #00E5FF;
-    --sunset-orange: #FFAD60;
-    --glass-bg: rgba(10, 25, 47, 0.4);
+    --bg-dark: #120428;
+    --zafiro-deep: #2A0845;
+    --cyan-electric: #FF5E3A; /* Naranja quemado / Coral */
+    --sunset-orange: #FFD166; /* Dorado */
+    --glass-bg: rgba(42, 8, 69, 0.4);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,23 +13,79 @@ body {
     font-family: 'Montserrat', sans-serif;
     overflow: hidden; height: 100vh; width: 100vw;
     cursor: crosshair; /* Cursor futurista */
+    animation: breathBackground 10s infinite alternate ease-in-out;
+}
+
+@keyframes breathBackground {
+    0% { background-color: #0A192F; } /* Azul marino */
+    100% { background-color: #120428; } /* Púrpura muy oscuro */
+}
+
+/* Brillo Estelar (Twinkle) */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 4px),
+                      radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                      radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+    background-size: 550px 550px, 350px 350px, 250px 250px;
+    background-position: 0 0, 40px 60px, 130px 270px;
+    opacity: 0.5;
+    animation: twinkle 4s infinite alternate ease-in-out;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.2; transform: scale(1); }
+    100% { opacity: 0.6; transform: scale(1.02); }
+}
+
+/* Elementos ocultos revelados por la linterna */
+body::before {
+    content: "Respira ✨ Eres Increíble 💙 Todo Fluye 🌟 Magia Zafiro";
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-around;
+    font-size: 1.8rem; font-weight: bold;
+    color: rgba(255, 255, 255, 0.02); /* Opacidad casi 0 */
+    padding: 100px; box-sizing: border-box;
+    line-height: 5; word-spacing: 30vw;
+    z-index: 0; pointer-events: none; text-align: center;
 }
 
 /* Aura del Cursor */
 #cursor-aura {
-    position: fixed; top: 0; left: 0; width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(0, 229, 255, 0.15) 0%, transparent 70%);
+    position: fixed; top: 0; left: 0; width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0, 229, 255, 0.4) 0%, transparent 60%);
     border-radius: 50%; pointer-events: none; z-index: 2;
     transform: translate(-50%, -50%); transition: opacity 1s ease; opacity: 0;
+    mix-blend-mode: color-dodge; /* Efecto de linterna mágica */
 }
 
-#network-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0; transition: opacity 4s ease-in-out; }
+#network-canvas { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; 
+    opacity: 0; transition: opacity 4s ease-in-out; 
+    background: #000; 
+    filter: blur(12px) contrast(35); 
+    mix-blend-mode: screen; /* Clave para el efecto Metaball 'Mercurio' */
+}
 
 .layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 2.5s ease-in-out; }
 .hidden { opacity: 0; pointer-events: none; transform: scale(1.1); filter: blur(15px); }
 
 /* Neblina */
 #lima-fog { background: rgba(200, 205, 210, 0.9); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); color: #333; text-align: center; z-index: 50; }
+
+.glitch-text { display: inline-block; transition: all 0.2s ease; }
+.glitch-text:hover { animation: elegantGlitch 0.3s linear infinite; }
+@keyframes elegantGlitch {
+    0% { text-shadow: 2px 0 0 #00E5FF, -2px 0 0 #FF00FF; }
+    33% { text-shadow: -2px 0 0 #00E5FF, 2px 0 0 #FF00FF; }
+    66% { text-shadow: 0 2px 0 #00E5FF, 0 -2px 0 #FF00FF; }
+    100% { text-shadow: 2px 0 0 #00E5FF, -2px 0 0 #FF00FF; }
+}
+
 .fog-content h2 { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.8; letter-spacing: -1px; }
 .fog-content p { font-size: 1.1rem; margin-bottom: 40px; font-weight: 300; }
 
@@ -45,12 +101,33 @@ body {
 /* 3D Glass Card */
 .scene-3d { perspective: 1200px; width: 100%; display: flex; justify-content: center; }
 .glass-card-3d {
-    background: var(--glass-bg); border: 1px solid rgba(0, 229, 255, 0.2);
+    background: var(--glass-bg); 
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border-radius: 30px; width: 400px; padding: 50px 40px;
     text-align: center; position: relative; transform-style: preserve-3d;
     box-shadow: 0 40px 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 229, 255, 0.1);
     transition: transform 0.15s ease-out;
+}
+
+.glass-card-3d::before {
+    content: ''; position: absolute; inset: 0;
+    border-radius: 30px; padding: 2px;
+    background: linear-gradient(45deg, var(--zafiro-deep), var(--sunset-orange), #00E5FF, var(--bg-dark));
+    background-size: 300% 300%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events: none; animation: borderTimeOfDay 15s ease infinite alternate;
+}
+@keyframes borderTimeOfDay {
+    0% { background-position: 0% 50%; } /* Tonos noche */
+    100% { background-position: 100% 50%; } /* Tonos tarde/cálidos */
+}
+
+/* Reflejo Dinámico (Specular Highlight) */
+.glass-card-3d::after {
+    content: ''; position: absolute; inset: 0; border-radius: 30px;
+    background: radial-gradient(circle at calc(50% - var(--mouse-x, 0px)) calc(50% - var(--mouse-y, 0px)), rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+    pointer-events: none; z-index: 2;
 }
 
 .card-glow { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.05), transparent 60%); pointer-events: none; transform: translateZ(-1px); }
@@ -96,4 +173,136 @@ body {
     transform: translateZ(60px) scale(1.2); /* Se vuelve más grande */
     box-shadow: 0 0 50px var(--sunset-orange);
     margin-top: 40px;
+}
+
+/* Audio Visualizer */
+.visualizer-container {
+    position: absolute;
+    bottom: 40px;
+    display: flex;
+    gap: 6px;
+    align-items: flex-end;
+    height: 50px;
+    z-index: 15;
+}
+
+.visualizer-container .bar {
+    width: 8px;
+    background: var(--cyan-electric);
+    border-radius: 4px;
+    animation: soundBounce 1.2s infinite ease-in-out alternate;
+    transform-origin: bottom;
+}
+.visualizer-container .bar:nth-child(1) { animation-delay: 0.1s; height: 20%; }
+.visualizer-container .bar:nth-child(2) { animation-delay: 0.4s; height: 60%; }
+.visualizer-container .bar:nth-child(3) { animation-delay: 0.0s; height: 100%; }
+.visualizer-container .bar:nth-child(4) { animation-delay: 0.3s; height: 50%; }
+.visualizer-container .bar:nth-child(5) { animation-delay: 0.2s; height: 30%; }
+
+@keyframes soundBounce {
+    0% { transform: scaleY(0.3); opacity: 0.5; }
+    100% { transform: scaleY(1.2); opacity: 1; box-shadow: 0 0 10px var(--cyan-electric); }
+}
+
+/* Daily Mantra */
+#daily-mantra {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 94, 58, 0.05);
+    border-left: 4px solid var(--sunset-orange);
+    border-radius: 0 10px 10px 0;
+    font-size: 0.95rem;
+    color: var(--sunset-orange);
+    transform: translateZ(40px);
+    transition: opacity 1s ease-in;
+}
+
+/* Buzón Zafiro */
+#buzon-zafiro {
+    margin-top: 20px;
+    transform: translateZ(40px);
+    transition: opacity 1s ease-in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.buzon-title {
+    font-size: 1.1rem;
+    color: var(--sunset-orange);
+    margin-bottom: 12px;
+    font-weight: 400;
+}
+
+#buzon-input {
+    width: 100%;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px 15px;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    resize: none;
+    outline: none;
+    transition: all 0.5s ease;
+    margin-bottom: 12px;
+}
+
+#buzon-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+#buzon-input:focus {
+    border-color: var(--cyan-electric);
+    background: rgba(0, 229, 255, 0.08);
+    animation: calmNeonPulse 2s infinite alternate ease-in-out;
+}
+
+@keyframes calmNeonPulse {
+    0% { box-shadow: 0 0 10px rgba(0, 229, 255, 0.2), inset 0 0 5px rgba(0, 229, 255, 0.1); }
+    100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.5), inset 0 0 10px rgba(0, 229, 255, 0.3); }
+}
+
+.send-btn {
+    padding: 10px 25px; border-radius: 20px;
+    background: rgba(0, 229, 255, 0.05); 
+    border: 1px solid var(--cyan-electric);
+    color: var(--cyan-electric); font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem; font-weight: 400; cursor: pointer; 
+    transition: all 0.4s ease; /* Transición más lenta para transmitir calma */
+}
+
+.send-btn:hover { 
+    background: rgba(0, 229, 255, 0.2); 
+    color: #fff; 
+    border-color: var(--cyan-electric); 
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4); 
+    transform: translateY(-2px); /* Se eleva suavemente en lugar de escalar bruscamente */
+}
+
+/* --- MODO FESTA ZAFIRO --- */
+body.festa-zafiro {
+    --bg-dark: #1a0033;
+    --zafiro-deep: #ff00ff;
+    --cyan-electric: #00ffcc;
+    --sunset-orange: #ff0066;
+    --glass-bg: rgba(255, 0, 255, 0.2);
+}
+
+.floating-neon-msg {
+    position: absolute;
+    color: #00ffcc;
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 40px #ff00ff;
+    pointer-events: none; z-index: 1000;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    animation: floatUpNeon 4s ease-out forwards;
+}
+
+@keyframes floatUpNeon {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    20% { transform: translate(-50%, -80%) scale(1.2); opacity: 1; }
+    100% { transform: translate(-50%, -200%) scale(1); opacity: 0; }
 }
