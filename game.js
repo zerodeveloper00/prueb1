@@ -95,6 +95,7 @@ function animateParticles() {
 const cinematicText = "No tienes que ser fuerte hoy.<br><br>Está bien no tener ganas de nada. Este espacio cuántico fue creado para ti. Cierra los ojos, escucha la música y recibe este abrazo desde Piura.<br><br><span class='highlight'>Eres la mejor socia del universo.</span>";
 
 async function typeWriterEffect(element, htmlString, speed = 40) {
+    if (!element) return Promise.resolve();
     element.innerHTML = "";
     let i = 0;
     let isTag = false;
@@ -172,8 +173,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e && e.type === 'touchstart') e.preventDefault(); // Evitar doble ejecución en táctil
 
         // 1. Iniciar Audio y Aura
-        bgMusic.volume = 0.5;
-        bgMusic.play().catch(e => console.log("Audio autoplay bloqueado, requiere interacción."));
+        if (bgMusic) {
+            bgMusic.volume = 0.5;
+            bgMusic.play().catch(e => console.log("Audio autoplay bloqueado, requiere interacción."));
+        }
         document.getElementById('cursor-aura').style.opacity = '1';
 
         // 2. Disipar Neblina
@@ -191,11 +194,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 4. Secuencia Cinematográfica (Empieza a escribir después de 2 seg)
         setTimeout(async () => {
-            await typeWriterEffect(textContainer, cinematicText, 45);
+            if (textContainer) await typeWriterEffect(textContainer, cinematicText, 45);
             // Mostrar botón final suavemente
-            claimBtn.classList.remove('hidden');
-            claimBtn.style.opacity = 0;
-            setTimeout(() => { claimBtn.style.opacity = 1; }, 500);
+            if (claimBtn) {
+                claimBtn.classList.remove('hidden');
+                claimBtn.style.opacity = 0;
+                setTimeout(() => { claimBtn.style.opacity = 1; }, 500);
+            }
 
             // Revelar mensaje secreto de identidad en el fondo
             const identityMsg = document.getElementById('identity-secret-msg');
@@ -226,18 +231,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchend', () => zafiroCard.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg)`);
 
     // Botón Final
-    claimBtn.addEventListener('click', function() {
-        this.innerText = "Energía Transferida 💛";
-        this.style.background = "var(--sunset-orange)";
-        this.style.color = "#000";
-        this.style.pointerEvents = "none";
-        
-        // Efecto de Explosión de Partículas
-        for(let p of particles) {
-            p.vx = (Math.random() - 0.5) * 20;
-            p.vy = (Math.random() - 0.5) * 20;
-        }
-    });
+    if (claimBtn) {
+        claimBtn.addEventListener('click', function() {
+            this.innerText = "Energía Transferida 💛";
+            this.style.background = "var(--sunset-orange)";
+            this.style.color = "#000";
+            this.style.pointerEvents = "none";
+            
+            // Efecto de Explosión de Partículas
+            for(let p of particles) {
+                p.vx = (Math.random() - 0.5) * 20;
+                p.vy = (Math.random() - 0.5) * 20;
+            }
+        });
+    }
 
 // --- 5. SISTEMA DE MANÁ DIARIO ---
 const mannaVerses = [
