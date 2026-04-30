@@ -298,7 +298,7 @@ function initDailyManna() {
     localStorage.setItem('mana_visit_count', visitCount);
 
     let verse = (visitCount >= 2) 
-        ? "Dios sigue siendo tu refugio, Yulexi. 🛡️" 
+        ? "[ESCRIBE AQUÍ EL NUEVO TEXTO BREVE]" 
         : mannaVerses[Math.floor(Math.random() * mannaVerses.length)];
 
     const scroll = document.createElement('div');
@@ -308,8 +308,8 @@ function initDailyManna() {
 
     setTimeout(() => {
         scroll.classList.add('fade-out');
-        setTimeout(() => scroll.remove(), 2500);
-    }, 6000);
+        setTimeout(() => scroll.remove(), 1000);
+    }, 3000);
 }
 // ... (Todo el código del Motor de Partículas anterior se mantiene igual) ...
 

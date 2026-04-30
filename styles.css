@@ -510,7 +510,7 @@ body.festa-zafiro {
     opacity: 1;
 }
 #mana-scroll .scroll-inner p { font-size: 1.1rem; line-height: 1.6; font-weight: 400; font-style: italic; margin: 0; }
-#mana-scroll.fade-out { opacity: 0; filter: blur(10px); transition: all 2.5s ease-in-out; }
+#mana-scroll.fade-out { opacity: 0; filter: blur(10px); transition: all 1s ease-in-out; }
 
 @keyframes scrollFadeIn {
     0% { opacity: 0; transform: translate(-50%, -60%) scale(0.9); filter: blur(10px); }
