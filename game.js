@@ -3,6 +3,7 @@ const canvas = document.getElementById('network-canvas');
 const ctx = canvas.getContext('2d');
 let particles = [];
 let mouse = { x: -1000, y: -1000 };
+let particleSpeedModifier = 1;
 
 window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -56,8 +57,8 @@ class Particle {
             this.vy = (this.vy / speed) * maxSpeed;
         }
         
-        this.x += this.vx; 
-        this.y += this.vy;
+        this.x += this.vx * particleSpeedModifier; 
+        this.y += this.vy * particleSpeedModifier;
 
         // Rebote suave en bordes
         if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
@@ -115,6 +116,8 @@ async function typeWriterEffect(element, htmlString, speed = 40) {
 
 document.addEventListener('DOMContentLoaded', () => {
     initParticles(); animateParticles();
+    initDailyManna();
+    checkGraceMemory();
 
     const fogLayer = document.getElementById('lima-fog');
     const oasisStage = document.getElementById('oasis-stage');
@@ -183,6 +186,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// --- 5. SISTEMA DE MANÁ DIARIO ---
+const mannaVerses = [
+    "No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo; siempre te ayudaré. (Isaías 41:10)",
+    "Dios es nuestro amparo y fortaleza, nuestro pronto auxilio en las tribulaciones. (Salmo 46:1)",
+    "Jehová es mi pastor; nada me faltará. En lugares de delicados pastos me hará descansar. (Salmo 23:1)",
+    "Porque yo sé los pensamientos que tengo acerca de ti, pensamientos de paz y no de mal. (Jeremías 29:11)",
+    "Todo lo puedo en Cristo que me fortalece. (Filipenses 4:13)",
+    "Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar. (Mateo 11:28)",
+    "Echando toda vuestra ansiedad sobre él, porque él tiene cuidado de vosotros. (1 Pedro 5:7)",
+    "Fíate de Jehová de todo tu corazón, y no te apoyes en tu propia prudencia. (Proverbios 3:5)",
+    "La paz os dejo, mi paz os doy; yo no os la doy como el mundo la da. (Juan 14:27)",
+    "Mira que te mando que te esfuerces y seas valiente; no temas ni desmayes. (Josué 1:9)"
+];
+
+function initDailyManna() {
+    const today = new Date().toDateString();
+    const lastVisit = localStorage.getItem('mana_last_date');
+    let visitCount = parseInt(localStorage.getItem('mana_visit_count') || '0');
+
+    if (lastVisit !== today) {
+        localStorage.setItem('mana_last_date', today);
+        visitCount = 1;
+    } else {
+        visitCount++;
+    }
+    localStorage.setItem('mana_visit_count', visitCount);
+
+    let verse = (visitCount >= 2) 
+        ? "Dios sigue siendo tu refugio, Yulexi. 🛡️" 
+        : mannaVerses[Math.floor(Math.random() * mannaVerses.length)];
+
+    const scroll = document.createElement('div');
+    scroll.id = 'mana-scroll';
+    scroll.innerHTML = `<div class="scroll-inner"><p>${verse}</p></div>`;
+    document.body.appendChild(scroll);
+
+    setTimeout(() => {
+        scroll.classList.add('fade-out');
+        setTimeout(() => scroll.remove(), 2500);
+    }, 6000);
+}
 // ... (Todo el código del Motor de Partículas anterior se mantiene igual) ...
 
 // --- 1. CONFIGURACIÓN DE LA BROMITA ---
@@ -337,6 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (buzonZafiro) {
                 buzonZafiro.classList.remove('hidden');
                 buzonZafiro.style.opacity = 1;
+                checkGraceMemory(); // Verificar memoria al revelar el altar
             }
         }, 1000);
     }
@@ -447,8 +493,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- 4. BUZÓN ZAFIRO (Conexión con el Universo) ---
 document.addEventListener('DOMContentLoaded', () => {
-    const sendBtn = document.getElementById('send-universe-btn');
+    const sendBtn = document.getElementById('send-btn');
     const buzonInput = document.getElementById('buzon-input');
+    const moodBtns = document.querySelectorAll('.mood-btn');
+    let selectedMood = '';
+    let moodTimeout;
+
+    moodBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            moodBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedMood = btn.getAttribute('data-mood');
+
+            // Mapeo de ánimos a las clases de animación en styles.css
+            const moodClasses = {
+                'Agradecida': 'mood-agradecida',
+                'Cansada': 'mood-cansada',
+                'Bendecida': 'mood-bendecida',
+                'Con chispa': 'mood-chispa'
+            };
+
+            const moodClass = moodClasses[selectedMood];
+            if (moodClass) {
+                // Limpiar estados previos y aplicar el nuevo al body
+                if (moodTimeout) clearTimeout(moodTimeout);
+                Object.values(moodClasses).forEach(cls => document.body.classList.remove(cls));
+                document.body.classList.add(moodClass);
+
+                // Ajuste de física según el ánimo
+                if (selectedMood === 'Cansada') particleSpeedModifier = 0.4; // Calma total
+                else if (selectedMood === 'Con chispa') particleSpeedModifier = 2.5; // Vibración alta
+                else particleSpeedModifier = 1;
+
+                // Retorno a la calma tras 4 segundos
+                moodTimeout = setTimeout(() => {
+                    document.body.classList.remove(moodClass);
+                    particleSpeedModifier = 1;
+                }, 4000);
+            }
+        });
+    });
 
     if (buzonInput) {
         const placeholders = [
@@ -471,24 +555,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Feedback de Interfaz: Enviando
             const originalText = sendBtn.innerText;
-            sendBtn.innerText = "Guardando en el cofre... ✨";
             sendBtn.disabled = true;
             sendBtn.style.opacity = '0.7';
 
             const webhookUrl = "https://discord.com/api/webhooks/1499446491419508947/Bp03dS7u2fOjF2fYDoke1eSqeV4s5w1u5FKuElm_lcUi6qWbIV7N3MpJZ-gbQixaq3rg";
+            const moodPrefix = selectedMood ? `✨ Estado de ánimo: ${selectedMood} ✨\n\n` : '';
 
             try {
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        content: `**Nuevo mensaje del Buzón Zafiro 💎:**\n> ${message}`
+                        content: `${moodPrefix}**🕊️ Entrega en el Altar de Gracia**\n> ${message}`
                     })
                 });
 
                 if (response.ok) {
                     buzonInput.value = ''; // Limpiar el campo
-                    sendBtn.innerText = "Recibido en Piura ✨";
+                    
+                    // Guardar en Memoria de Gracia
+                    localStorage.setItem('grace_last_text', message);
+                    localStorage.setItem('grace_last_date', new Date().toDateString());
+                    checkGraceMemory();
+
+                    // Respuesta personalizada según el ánimo
+                    if (selectedMood === 'Cansada') {
+                        sendBtn.innerText = "Descansa en Su soberanía, Yulexi";
+                    } else if (selectedMood === 'Con chispa') {
+                        sendBtn.innerText = "¡Esa es mi socia! Me hiciste el día";
+                    } else {
+                        sendBtn.innerText = "Tu oración ha sido entregada. Respira, Abejita... 🙏";
+                    }
+                    
+                    // Limpieza visual tras el envío
+                    selectedMood = '';
+                    moodBtns.forEach(b => b.classList.remove('selected'));
                 } else {
                     throw new Error('Error en la petición');
                 }
@@ -506,3 +607,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// --- 6. MEMORIA DE GRACIA ---
+function checkGraceMemory() {
+    const today = new Date().toDateString();
+    const lastDate = localStorage.getItem('grace_last_date');
+    const lastText = localStorage.getItem('grace_last_text');
+    const buzon = document.getElementById('buzon-zafiro');
+    const historyIcon = document.getElementById('grace-history');
+    const historyMsg = document.getElementById('history-msg');
+
+    if (!buzon) return;
+
+    // Si ya envió una gratitud hoy, activar el aura dorada
+    if (lastDate === today) {
+        buzon.classList.add('aura-gold');
+    }
+
+    // Si hay un historial de un día anterior, mostrar el icono
+    if (lastText && lastDate !== today) {
+        historyIcon.classList.remove('hidden');
+        if (historyMsg) {
+            historyMsg.innerText = `¿Recuerdas que anteriormente estabas agradecida por: "${lastText}"? Dios es fiel.`;
+        }
+    }
+}

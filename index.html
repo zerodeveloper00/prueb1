@@ -9,6 +9,8 @@
 </head>
 <body id="app-body">
     <div id="cursor-aura"></div>
+    <!-- Mensaje Secreto de Identidad -->
+    <div id="identity-secret-msg">El Santuario brilla más cuando tú estás aquí, Socia ✨</div>
 
     <canvas id="network-canvas"></canvas>
 
@@ -55,9 +57,27 @@
                     </div>
 
                     <div id="buzon-zafiro" class="hidden">
-                        <h4 class="buzon-title">Tu Cofre de los Anhelos 💎</h4>
-                        <textarea id="buzon-input" placeholder="¿Qué piensas ahora?"></textarea>
-                        <button id="send-universe-btn" class="send-btn">Confiar al Zafiro ✨</button>
+                        <!-- Memoria de Gracia -->
+                        <div id="grace-history" class="history-icon hidden">
+                            📜
+                            <div class="history-tooltip" id="history-msg"></div>
+                        </div>
+                        <h4 class="buzon-title">Confía tus cargas al Soberano</h4>
+                        <p style="color: var(--sunset-orange); font-size: 0.9rem; margin-bottom: 15px; transform: translateZ(40px);">Altar de Gracia 🕊️</p>
+                        
+                        <div class="mood-tracker">
+                            <p class="mood-title">¿Cómo está tu corazón hoy, Abejita?</p>
+                            <div class="mood-options">
+                                <button type="button" class="mood-btn" data-mood="Agradecida">🌻 Agradecida</button>
+                                <button type="button" class="mood-btn" data-mood="Cansada">☁️ Cansada</button>
+                                <button type="button" class="mood-btn" data-mood="Bendecida">✨ Bendecida</button>
+                                <button type="button" class="mood-btn" data-mood="Con chispa">😉 Con chispa</button>
+                            </div>
+                        </div>
+
+                        <textarea id="buzon-input" placeholder="¿Por qué das gracias hoy, Abejita? 🐝"></textarea>
+                        <div id="mensaje-secreto" class="secret-msg-box hidden"></div>
+                        <button id="send-btn" class="send-btn">Entregar en Oración 🙏</button>
                     </div>
                 </div>
             </div>

@@ -225,6 +225,57 @@ body::before {
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+}
+
+/* Memoria de Gracia */
+.history-icon {
+    position: absolute;
+    top: -10px; right: 10px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    z-index: 50;
+    filter: drop-shadow(0 0 5px #D4AF37);
+    transition: transform 0.3s ease;
+}
+.history-icon:hover { transform: scale(1.2); }
+.history-tooltip {
+    position: absolute;
+    bottom: 120%; right: 0;
+    width: 220px;
+    background: rgba(18, 4, 40, 0.95);
+    border: 1px solid #D4AF37;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #fff;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+.history-icon:hover .history-tooltip { opacity: 1; }
+.aura-gold { box-shadow: 0 0 50px 15px rgba(212, 175, 55, 0.4) !important; }
+
+.mood-tracker {
+    text-align: center;
+    margin-bottom: 20px;
+    transform: translateZ(45px);
+}
+
+.mood-title {
+    font-size: 0.85rem;
+    color: #D4AF37;
+    margin-bottom: 12px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+.mood-options {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .buzon-title {
@@ -238,7 +289,7 @@ body::before {
     width: 100%;
     min-height: 120px;
     background: rgba(10, 25, 47, 0.4);
-    border: 1px solid rgba(0, 229, 255, 0.2);
+    border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 15px;
     padding: 15px;
     color: white;
@@ -264,25 +315,100 @@ body::before {
 }
 
 @keyframes alivePulse {
-    0% { border-color: rgba(0, 229, 255, 0.1); box-shadow: inset 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 5px rgba(0, 229, 255, 0.05); }
-    100% { border-color: rgba(0, 229, 255, 0.4); box-shadow: inset 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 229, 255, 0.2); }
+    0% { 
+        border-color: rgba(212, 175, 55, 0.2); 
+        box-shadow: inset 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 250, 240, 0.1); 
+    }
+    100% { 
+        border-color: rgba(212, 175, 55, 0.6); 
+        box-shadow: inset 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 250, 240, 0.25); 
+    }
 }
 
 .send-btn {
     padding: 10px 25px; border-radius: 20px;
-    background: rgba(0, 229, 255, 0.05); 
-    border: 1px solid var(--cyan-electric);
-    color: var(--cyan-electric); font-family: 'Montserrat', sans-serif;
+    background: rgba(212, 175, 55, 0.05); 
+    border: 1px solid #D4AF37;
+    color: #D4AF37; font-family: 'Montserrat', sans-serif;
     font-size: 0.95rem; font-weight: 400; cursor: pointer; 
     transition: all 0.4s ease; /* Transición más lenta para transmitir calma */
 }
 
 .send-btn:hover { 
-    background: rgba(0, 229, 255, 0.2); 
+    background: rgba(212, 175, 55, 0.15); 
     color: #fff; 
-    border-color: var(--cyan-electric); 
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4); 
+    border-color: #D4AF37; 
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); 
     transform: translateY(-2px); /* Se eleva suavemente en lugar de escalar bruscamente */
+}
+
+/* --- ANIMACIONES DE ESTADO DE ÁNIMO --- */
+
+/* 🌻 Agradecida: Resplandor radial ámbar y verde */
+.mood-agradecida {
+    animation: aura-agradecida 4s ease-in-out forwards;
+    border-radius: 15px;
+}
+@keyframes aura-agradecida {
+    0%, 100% { box-shadow: 0 0 0 rgba(212, 175, 55, 0); }
+    50% { box-shadow: 0 0 80px 20px rgba(212, 175, 55, 0.3), inset 0 0 40px rgba(76, 175, 80, 0.2); }
+}
+
+/* ☁️ Cansada: Niebla de descanso (Blur + Brightness) */
+.mood-cansada {
+    animation: fog-cansada 4s ease-in-out forwards;
+}
+@keyframes fog-cansada {
+    0%, 100% { filter: blur(0px) brightness(1); }
+    50% { filter: blur(4px) brightness(1.2); }
+}
+
+/* ✨ Bendecida: Lluvia de destellos dorados y blancos */
+.mood-bendecida {
+    position: relative;
+    animation: glow-bendecida 4s ease-in-out forwards;
+}
+.mood-bendecida::before {
+    content: '';
+    position: absolute;
+    top: -20px; left: 0; right: 0; bottom: 0;
+    background-image: 
+        radial-gradient(circle, #fff 1px, transparent 1px),
+        radial-gradient(circle, #D4AF37 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: 0 0;
+    animation: falling-sparkles 4s linear forwards;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 5;
+}
+@keyframes glow-bendecida {
+    0%, 100% { background: transparent; }
+    50% { background: rgba(255, 255, 255, 0.05); }
+}
+@keyframes falling-sparkles {
+    0% { transform: translateY(0); opacity: 0; }
+    20%, 80% { opacity: 0.8; }
+    100% { transform: translateY(40px); opacity: 0; }
+}
+
+/* 😉 Con chispa: Flash Sunset Orange + Giro de botón */
+.mood-chispa {
+    animation: flash-chispa 4s ease-in-out forwards;
+}
+@keyframes flash-chispa {
+    0%, 100% { background: transparent; }
+    10% { background: rgba(255, 94, 58, 0.2); } /* Sunset Orange flash */
+    20% { background: transparent; }
+}
+
+/* Giro específico para el botón seleccionado dentro del contenedor con chispa */
+.mood-chispa .mood-btn.selected {
+    animation: spin-btn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes spin-btn {
+    0% { transform: scale(1.08) rotate(0deg); }
+    100% { transform: scale(1.08) rotate(360deg); }
 }
 
 /* --- MODO FESTA ZAFIRO --- */
@@ -310,4 +436,75 @@ body.festa-zafiro {
     0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
     20% { transform: translate(-50%, -80%) scale(1.2); opacity: 1; }
     100% { transform: translate(-50%, -200%) scale(1); opacity: 0; }
+}
+
+/* --- 5. SISTEMA DE MANÁ DIARIO (Digital Scroll) --- */
+#mana-scroll {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    width: 320px;
+    padding: 40px 30px;
+    background: #fdf5e6;
+    border-top: 15px solid #8b4513;
+    border-bottom: 15px solid #8b4513;
+    border-radius: 5px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    text-align: center;
+    color: #4e342e;
+    font-family: 'Montserrat', sans-serif;
+    animation: scrollFadeIn 1.5s ease-out forwards;
+    pointer-events: none;
+    opacity: 1;
+}
+#mana-scroll .scroll-inner p { font-size: 1.1rem; line-height: 1.6; font-weight: 400; font-style: italic; margin: 0; }
+#mana-scroll.fade-out { opacity: 0; filter: blur(10px); transition: all 2.5s ease-in-out; }
+
+@keyframes scrollFadeIn {
+    0% { opacity: 0; transform: translate(-50%, -60%) scale(0.9); filter: blur(10px); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
+}
+
+/* --- 6. EFECTO DE IDENTIDAD --- */
+#identity-secret-msg {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    padding: 12px 20px;
+    border-radius: 15px;
+    color: #FFD166;
+    font-size: 0.85rem;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 2s ease, transform 2s ease;
+    pointer-events: none;
+    transform: translateY(10px);
+}
+#identity-secret-msg.reveal { opacity: 1; transform: translateY(0); }
+
+/* --- ESTILO DEL MENSAJE SECRETO (COFRE) --- */
+#mensaje-secreto {
+    position: absolute;
+    bottom: 65px;
+    right: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 0.72rem;
+    color: #D4AF37;
+    opacity: 0;
+    transition: opacity 1s ease, text-shadow 1s ease, transform 1s ease;
+    pointer-events: none;
+    z-index: 10;
+    letter-spacing: 0.3px;
+}
+
+#mensaje-secreto.visible {
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4), 0 0 15px rgba(212, 175, 55, 0.5);
+    transform: translateY(-5px);
 }
