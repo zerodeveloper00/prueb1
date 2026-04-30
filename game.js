@@ -177,15 +177,18 @@ document.addEventListener('DOMContentLoaded', () => {
             bgMusic.volume = 0.5;
             bgMusic.play().catch(e => console.log("Audio autoplay bloqueado, requiere interacción."));
         }
-        document.getElementById('cursor-aura').style.opacity = '1';
+        const cursorAura = document.getElementById('cursor-aura');
+        if (cursorAura) cursorAura.style.opacity = '1';
 
         // 2. Disipar Neblina
-        fogLayer.style.opacity = '0';
-        setTimeout(() => fogLayer.style.display = 'none', 2500);
+        if (fogLayer) {
+            fogLayer.style.opacity = '0';
+            setTimeout(() => fogLayer.style.display = 'none', 2500);
+        }
         
         // 3. Revelar Universo
-        canvasEl.style.opacity = '1';
-        oasisStage.classList.remove('hidden');
+        if (canvasEl) canvasEl.style.opacity = '1';
+        if (oasisStage) oasisStage.classList.remove('hidden');
 
         // Apagar el micro al disipar la neblina
         if (recognition) {
@@ -208,27 +211,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
     };
 
-    awakenBtn.addEventListener('click', awakenHandler);
-    awakenBtn.addEventListener('touchstart', awakenHandler, { passive: false });
+    if (awakenBtn) {
+        awakenBtn.addEventListener('click', awakenHandler);
+        awakenBtn.addEventListener('touchstart', awakenHandler, { passive: false });
+    }
 
     // Efecto 3D de la tarjeta (Suavizado Extremo)
-    const handleTilt = (clientX, clientY) => {
-        const rect = zafiroCard.getBoundingClientRect();
-        const x = clientX - rect.left - rect.width / 2;
-        const y = clientY - rect.top - rect.height / 2;
-        const rotateX = -(y / rect.height) * 20; 
-        const rotateY = (x / rect.width) * 20;
-        zafiroCard.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-        
-        zafiroCard.style.setProperty('--mouse-x', `${x}px`);
-        zafiroCard.style.setProperty('--mouse-y', `${y}px`);
-    };
+    if (zafiroCard) {
+        const handleTilt = (clientX, clientY) => {
+            const rect = zafiroCard.getBoundingClientRect();
+            const x = clientX - rect.left - rect.width / 2;
+            const y = clientY - rect.top - rect.height / 2;
+            const rotateX = -(y / rect.height) * 20; 
+            const rotateY = (x / rect.width) * 20;
+            zafiroCard.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            
+            zafiroCard.style.setProperty('--mouse-x', `${x}px`);
+            zafiroCard.style.setProperty('--mouse-y', `${y}px`);
+        };
 
-    document.addEventListener('mousemove', (e) => handleTilt(e.clientX, e.clientY));
-    document.addEventListener('touchmove', (e) => handleTilt(e.touches[0].clientX, e.touches[0].clientY));
-    
-    document.addEventListener('mouseleave', () => zafiroCard.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg)`);
-    document.addEventListener('touchend', () => zafiroCard.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg)`);
+        document.addEventListener('mousemove', (e) => handleTilt(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => handleTilt(e.touches[0].clientX, e.touches[0].clientY));
+        
+        document.addEventListener('mouseleave', () => zafiroCard.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg)`);
+        document.addEventListener('touchend', () => zafiroCard.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg)`);
+    }
 
     // Botón Final
     if (claimBtn) {
@@ -341,7 +348,9 @@ const maxEscapes = 5; // Cuántas veces escapa antes de dejarse atrapar
         escapeCount++;
         
         // Cambiamos el mensaje para picarla un poco
-        bromaStatus.innerHTML = bromaPhrases[escapeCount - 1] || bromaPhrases[0];
+        if (bromaStatus) bromaStatus.innerHTML = bromaPhrases[escapeCount - 1] || bromaPhrases[0];
+        
+        if (!zafiroCard || !bromaBtn) return; // Seguridad extra si faltan elementos clave
         
         // Calculamos nueva posición aleatoria dentro de la tarjeta
         // Obtenemos dimensiones de la tarjeta (zafiroCard)
@@ -394,13 +403,15 @@ const maxEscapes = 5; // Cuántas veces escapa antes de dejarse atrapar
 
     function endPrank() {
         // Quitamos la lógica de escape
-        bromaBtn.removeEventListener('mouseover', handleEscape);
-        bromaBtn.removeEventListener('touchstart', handleEscape);
-        
-        // Restauramos el botón y cambiamos el estado
-        bromaBtn.classList.add('atrapado');
-        bromaBtn.innerText = "¡Me ampayaste! ✨";
-        bromaStatus.style.opacity = 0; // Ocultar mensajes de broma
+        if (bromaBtn) {
+            bromaBtn.removeEventListener('mouseover', handleEscape);
+            bromaBtn.removeEventListener('touchstart', handleEscape);
+            
+            // Restauramos el botón y cambiamos el estado
+            bromaBtn.classList.add('atrapado');
+            bromaBtn.innerText = "¡Me ampayaste! ✨";
+        }
+        if (bromaStatus) bromaStatus.style.opacity = 0; // Ocultar mensajes de broma
         
         // Unos segundos después, mostramos el abrazo real
         setTimeout(() => {
@@ -426,25 +437,27 @@ const maxEscapes = 5; // Cuántas veces escapa antes de dejarse atrapar
     }
 
     // Activamos la broma para desktop y móvil
-    bromaBtn.addEventListener('mouseover', handleEscape); // Cuando el mouse se acerca
-    bromaBtn.addEventListener('touchstart', (e) => { // Cuando el dedo toca
-        e.preventDefault(); // Evita el clic real en el primer toque
-        handleEscape(e);
-    });
+    if (bromaBtn) {
+        bromaBtn.addEventListener('mouseover', handleEscape); // Cuando el mouse se acerca
+        bromaBtn.addEventListener('touchstart', (e) => { // Cuando el dedo toca
+            e.preventDefault(); // Evita el clic real en el primer toque
+            handleEscape(e);
+        });
 
-    // Botón Final (Cuando ya lo atrapó)
-    bromaBtn.addEventListener('click', function() {
-        if (!this.classList.contains('atrapado')) return; // No hace nada si está escapando
-        
-        this.innerText = "Abrazo Transferido 💛";
-        this.style.pointerEvents = "none";
-        
-        // Explosión suave de partículas
-        for(let p of particles) {
-            p.vx = (Math.random() - 0.5) * 15;
-            p.vy = (Math.random() - 0.5) * 15;
-        }
-    });
+        // Botón Final (Cuando ya lo atrapó)
+        bromaBtn.addEventListener('click', function() {
+            if (!this.classList.contains('atrapado')) return; // No hace nada si está escapando
+            
+            this.innerText = "Abrazo Transferido 💛";
+            this.style.pointerEvents = "none";
+            
+            // Explosión suave de partículas
+            for(let p of particles) {
+                p.vx = (Math.random() - 0.5) * 15;
+                p.vy = (Math.random() - 0.5) * 15;
+            }
+        });
+    }
 
     // --- EASTER EGG: Ritmo Piurano (3 Rápidas, 2 Lentas) ---
     let clickTimes = [];
