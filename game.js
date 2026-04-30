@@ -46,7 +46,6 @@ class Particle {
             this.radius = this.baseRadius;
         }
 
-        
         // Fricción y límite de velocidad para estabilizar la órbita
         this.vx *= 0.98; this.vy *= 0.98; // Se calman solas
         
