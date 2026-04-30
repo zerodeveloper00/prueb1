@@ -11,7 +11,7 @@
 body {
     background: var(--bg-dark); color: white;
     font-family: 'Montserrat', sans-serif;
-    overflow: hidden; height: 100vh; width: 100vw;
+    overflow-x: hidden; min-height: 100vh; width: 100%;
     cursor: crosshair; /* Cursor futurista */
     animation: breathBackground 10s infinite alternate ease-in-out;
 }
@@ -73,6 +73,14 @@ body::before {
 
 .layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 2.5s ease-in-out; }
 .hidden { opacity: 0; pointer-events: none; transform: scale(1.1); filter: blur(15px); }
+
+/* Desvinculamos el escenario principal para que permita scroll */
+#oasis-stage {
+    position: relative;
+    height: auto;
+    min-height: 100vh;
+    padding: 60px 15px; /* Espacio para respirar arriba y abajo */
+}
 
 /* Neblina */
 #lima-fog { 

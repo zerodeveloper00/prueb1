@@ -146,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             if (fogLayer) {
                 fogLayer.style.opacity = '0';
+                fogLayer.style.pointerEvents = 'none'; // Libera la pantalla para clics/scroll instantáneamente
                 setTimeout(() => { if (fogLayer) fogLayer.style.display = 'none'; }, 2500);
             }
             if (canvasEl) canvasEl.style.opacity = '1';
