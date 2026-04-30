@@ -1,24 +1,29 @@
 // --- 1. MOTOR DE FÍSICA REACTIVA (Canvas) ---
-const canvas = document.getElementById('network-canvas');
-const ctx = canvas ? canvas.getContext('2d') : null;
+let canvas, ctx, aura;
 let particles = [];
 let mouse = { x: -1000, y: -1000 };
 let particleSpeedModifier = 1;
 
-if (canvas) {
-    window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-}
+window.addEventListener('DOMContentLoaded', () => {
+    // Carga segura del DOM
+    canvas = document.getElementById('network-canvas');
+    ctx = canvas ? canvas.getContext('2d') : null;
+    aura = document.getElementById('cursor-aura');
 
-// Seguimiento del Mouse para Física y Aura
-const aura = document.getElementById('cursor-aura');
-window.addEventListener('mousemove', (e) => {
-    mouse.x = e.clientX; mouse.y = e.clientY;
-    if (aura) { aura.style.left = `${e.clientX}px`; aura.style.top = `${e.clientY}px`; }
-});
-window.addEventListener('touchmove', (e) => {
-    mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY;
-    if (aura) { aura.style.left = `${mouse.x}px`; aura.style.top = `${mouse.y}px`; }
+    if (canvas) {
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    }
+
+    // Seguimiento del Mouse para Física y Aura
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX; mouse.y = e.clientY;
+        if (aura) { aura.style.left = `${e.clientX}px`; aura.style.top = `${e.clientY}px`; }
+    });
+    window.addEventListener('touchmove', (e) => {
+        mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY;
+        if (aura) { aura.style.left = `${mouse.x}px`; aura.style.top = `${mouse.y}px`; }
+    });
 });
 
 class Particle {
@@ -136,6 +141,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const buzonInput = document.getElementById('buzon-input');
     const moodBtns = document.querySelectorAll('.mood-btn');
 
+    // --- AISLAMIENTO DE LA PANTALLA DE CARGA ---
+    const hideSplashScreen = () => {
+        try {
+            if (fogLayer) {
+                fogLayer.style.opacity = '0';
+                setTimeout(() => { if (fogLayer) fogLayer.style.display = 'none'; }, 2500);
+            }
+            if (canvasEl) canvasEl.style.opacity = '1';
+            if (oasisStage) oasisStage.classList.remove('hidden');
+        } catch (error) {
+            console.error("Error al ocultar Splash Screen:", error);
+        }
+    };
+
     // --- INTERACCIÓN POR VOZ (El Suspiro) ---
     let recognition;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -173,22 +192,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e && e.type === 'touchstart') e.preventDefault(); // Evitar doble ejecución en táctil
 
         // 1. Iniciar Audio y Aura
-        if (bgMusic) {
-            bgMusic.volume = 0.5;
-            bgMusic.play().catch(e => console.log("Audio autoplay bloqueado, requiere interacción."));
+        try {
+            if (bgMusic) {
+                bgMusic.volume = 0.5;
+                bgMusic.play().catch(e => console.log("Audio autoplay bloqueado, requiere interacción."));
+            }
+        } catch (err) {
+            console.error("Error de audio evitado:", err);
         }
         const cursorAura = document.getElementById('cursor-aura');
         if (cursorAura) cursorAura.style.opacity = '1';
 
-        // 2. Disipar Neblina
-        if (fogLayer) {
-            fogLayer.style.opacity = '0';
-            setTimeout(() => fogLayer.style.display = 'none', 2500);
-        }
-        
-        // 3. Revelar Universo
-        if (canvasEl) canvasEl.style.opacity = '1';
-        if (oasisStage) oasisStage.classList.remove('hidden');
+        // 2. Disipar Neblina y 3. Revelar Universo
+        hideSplashScreen();
 
         // Apagar el micro al disipar la neblina
         if (recognition) {
@@ -211,10 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
     };
 
-    if (awakenBtn) {
-        awakenBtn.addEventListener('click', awakenHandler);
-        awakenBtn.addEventListener('touchstart', awakenHandler, { passive: false });
-    }
+    // Protección Quirúrgica (Optional Chaining)
+    awakenBtn?.addEventListener('click', awakenHandler);
+    awakenBtn?.addEventListener('touchstart', awakenHandler, { passive: false });
 
     // Efecto 3D de la tarjeta (Suavizado Extremo)
     if (zafiroCard) {
