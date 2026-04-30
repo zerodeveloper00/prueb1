@@ -1,0 +1,99 @@
+:root {
+    --bg-dark: #020611;
+    --zafiro-deep: #0A192F;
+    --cyan-electric: #00E5FF;
+    --sunset-orange: #FFAD60;
+    --glass-bg: rgba(10, 25, 47, 0.4);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg-dark); color: white;
+    font-family: 'Montserrat', sans-serif;
+    overflow: hidden; height: 100vh; width: 100vw;
+    cursor: crosshair; /* Cursor futurista */
+}
+
+/* Aura del Cursor */
+#cursor-aura {
+    position: fixed; top: 0; left: 0; width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(0, 229, 255, 0.15) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none; z-index: 2;
+    transform: translate(-50%, -50%); transition: opacity 1s ease; opacity: 0;
+}
+
+#network-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0; transition: opacity 4s ease-in-out; }
+
+.layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 2.5s ease-in-out; }
+.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); filter: blur(15px); }
+
+/* Neblina */
+#lima-fog { background: rgba(200, 205, 210, 0.9); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); color: #333; text-align: center; z-index: 50; }
+.fog-content h2 { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.8; letter-spacing: -1px; }
+.fog-content p { font-size: 1.1rem; margin-bottom: 40px; font-weight: 300; }
+
+.core-btn {
+    width: 140px; height: 140px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--sunset-orange), #ff7e5f);
+    border: none; color: white; font-weight: bold; font-size: 1.2rem;
+    cursor: pointer; box-shadow: 0 0 50px rgba(255, 173, 96, 0.6);
+    animation: pulseCore 4s infinite ease-in-out; transition: 0.5s;
+}
+.core-btn:hover { transform: scale(1.1); box-shadow: 0 0 80px rgba(255, 173, 96, 1); letter-spacing: 2px; }
+
+/* 3D Glass Card */
+.scene-3d { perspective: 1200px; width: 100%; display: flex; justify-content: center; }
+.glass-card-3d {
+    background: var(--glass-bg); border: 1px solid rgba(0, 229, 255, 0.2);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-radius: 30px; width: 400px; padding: 50px 40px;
+    text-align: center; position: relative; transform-style: preserve-3d;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 229, 255, 0.1);
+    transition: transform 0.15s ease-out;
+}
+
+.card-glow { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.05), transparent 60%); pointer-events: none; transform: translateZ(-1px); }
+
+.floating-icon { font-size: 4.5rem; margin-bottom: 20px; transform: translateZ(60px); text-shadow: 0 15px 30px rgba(0,0,0,0.6); animation: floatIcon 5s infinite ease-in-out; }
+.glass-card-3d h3 { font-size: 2rem; color: var(--cyan-electric); transform: translateZ(40px); margin-bottom: 15px; letter-spacing: 1px; }
+.divider { height: 2px; background: linear-gradient(90deg, transparent, var(--cyan-electric), transparent); margin: 20px 0; transform: translateZ(30px); opacity: 0.5; }
+
+/* Texto Cinematográfico */
+.typewriter-text { font-size: 1.05rem; line-height: 1.7; color: #E0F7FA; transform: translateZ(35px); margin-bottom: 25px; min-height: 120px; }
+.highlight { font-weight: bold; color: var(--sunset-orange); }
+
+.claim-btn { margin-top: 20px; padding: 15px 35px; border-radius: 25px; background: transparent; border: 2px solid var(--sunset-orange); color: var(--sunset-orange); font-weight: bold; font-size: 1.1rem; cursor: pointer; transform: translateZ(50px); transition: 0.4s; }
+.claim-btn:hover { background: var(--sunset-orange); color: #000; box-shadow: 0 0 30px var(--sunset-orange); transform: translateZ(60px) scale(1.05); }
+
+@keyframes pulseCore { 0% { transform: scale(0.95); box-shadow: 0 0 20px rgba(255,173,96,0.3); } 50% { transform: scale(1.05); box-shadow: 0 0 70px rgba(255,173,96,0.8); } 100% { transform: scale(0.95); box-shadow: 0 0 20px rgba(255,173,96,0.3); } }
+@keyframes floatIcon { 0%, 100% { transform: translateZ(60px) translateY(0); } 50% { transform: translateZ(60px) translateY(-20px); } }
+
+/* ... (Todo el CSS anterior se mantiene igual hasta la clase .claim-btn) ... */
+
+.typewriter-text { font-size: 1.05rem; line-height: 1.7; color: #E0F7FA; transform: translateZ(35px); margin-bottom: 25px; min-height: 100px; transition: opacity 0.5s; }
+.hidden { opacity: 0; pointer-events: none; display: none; }
+
+/* EL BOTÓN FUGITIVO: Añadimos posición absoluta para que pueda escapar dentro de la tarjeta */
+.claim-btn {
+    margin-top: 20px; padding: 15px 35px; border-radius: 25px;
+    background: transparent; border: 2px solid var(--cyan-electric);
+    color: var(--cyan-electric); font-weight: bold; font-size: 1.1rem;
+    cursor: pointer; transform: translateZ(50px);
+    
+    /* MÁGICA DE LA BROMITA */
+    position: relative; /* Cambia a absolute en JS al escapar */
+    transition: all 0.2s ease-out; /* Deslizamiento suave, no teletransporte */
+    z-index: 100;
+}
+
+.claim-btn:hover { background: var(--cyan-electric); color: #000; box-shadow: 0 0 30px var(--cyan-electric); }
+
+/* Cuando ella gana */
+.claim-btn.atrapado {
+    position: relative !important; top: 0 !important; left: 0 !important;
+    background: var(--sunset-orange); color: #000; border-color: transparent;
+    transform: translateZ(60px) scale(1.2); /* Se vuelve más grande */
+    box-shadow: 0 0 50px var(--sunset-orange);
+    margin-top: 40px;
+}
