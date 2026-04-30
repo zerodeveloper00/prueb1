@@ -1,22 +1,24 @@
 // --- 1. MOTOR DE FÍSICA REACTIVA (Canvas) ---
 const canvas = document.getElementById('network-canvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas ? canvas.getContext('2d') : null;
 let particles = [];
 let mouse = { x: -1000, y: -1000 };
 let particleSpeedModifier = 1;
 
-window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
-canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+if (canvas) {
+    window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+}
 
 // Seguimiento del Mouse para Física y Aura
 const aura = document.getElementById('cursor-aura');
 window.addEventListener('mousemove', (e) => {
     mouse.x = e.clientX; mouse.y = e.clientY;
-    aura.style.left = `${e.clientX}px`; aura.style.top = `${e.clientY}px`;
+    if (aura) { aura.style.left = `${e.clientX}px`; aura.style.top = `${e.clientY}px`; }
 });
 window.addEventListener('touchmove', (e) => {
     mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY;
-    aura.style.left = `${mouse.x}px`; aura.style.top = `${mouse.y}px`;
+    if (aura) { aura.style.left = `${mouse.x}px`; aura.style.top = `${mouse.y}px`; }
 });
 
 class Particle {
@@ -65,6 +67,7 @@ class Particle {
         if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
     }
     draw() {
+        if (!ctx) return;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = '#00E5FF'; // Cian eléctrico (base del líquido)
@@ -73,12 +76,14 @@ class Particle {
 }
 
 function initParticles() {
+    if (!canvas) return;
     particles = [];
     let numParticles = window.innerWidth < 768 ? 50 : 100;
     for (let i = 0; i < numParticles; i++) particles.push(new Particle());
 }
 
 function animateParticles() {
+    if (!ctx || !canvas) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < particles.length; i++) {
         particles[i].update(); particles[i].draw();
@@ -115,10 +120,6 @@ async function typeWriterEffect(element, htmlString, speed = 40) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    initParticles(); animateParticles();
-    initDailyManna();
-    checkGraceMemory();
-
     const fogLayer = document.getElementById('lima-fog');
     const oasisStage = document.getElementById('oasis-stage');
     const awakenBtn = document.getElementById('awaken-btn');
@@ -127,6 +128,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const bgMusic = document.getElementById('bg-music');
     const textContainer = document.getElementById('cinematic-text');
     const claimBtn = document.getElementById('claim-btn');
+    const bromaBtn = document.getElementById('broma-btn');
+    const bromaStatus = document.getElementById('broma-status');
+    const finalMessage = document.getElementById('final-message');
+    const sendBtn = document.getElementById('send-btn');
+    const buzonInput = document.getElementById('buzon-input');
+    const moodBtns = document.querySelectorAll('.mood-btn');
+
+    // --- INTERACCIÓN POR VOZ (El Suspiro) ---
+    let recognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.lang = 'es-ES';
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
+            if (transcript.includes('estoy cansada') || transcript.includes('cansada') || transcript.includes('suspiro')) {
+                if (awakenBtn && fogLayer && fogLayer.style.display !== 'none') {
+                    awakenBtn.style.boxShadow = '0 0 150px rgba(0, 229, 255, 1), 0 0 50px rgba(0, 229, 255, 0.8)';
+                    awakenBtn.style.transform = 'scale(1.3)';
+                    awakenBtn.style.background = 'var(--cyan-electric)';
+                    awakenBtn.innerText = 'Ráfaga Zafiro 💎';
+                    
+                    setTimeout(() => {
+                        fogLayer.style.transition = 'all 0.3s ease-out'; 
+                        awakenBtn.click();
+                    }, 800);
+                }
+            }
+        };
+        try { recognition.start(); } catch(e) {}
+    }
 
     // Despertar el Santuario
     awakenBtn.addEventListener('click', async () => {
@@ -142,6 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. Revelar Universo
         canvasEl.style.opacity = '1';
         oasisStage.classList.remove('hidden');
+
+        // Apagar el micro al disipar la neblina
+        if (recognition) {
+            try { recognition.stop(); } catch(e) {}
+        }
 
         // 4. Secuencia Cinematográfica (Empieza a escribir después de 2 seg)
         setTimeout(async () => {
@@ -185,7 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
             p.vy = (Math.random() - 0.5) * 20;
         }
     });
-});
 
 // --- 5. SISTEMA DE MANÁ DIARIO ---
 const mannaVerses = [
@@ -274,27 +313,6 @@ function obtenerFrasesPorDia() {
 const bromaPhrases = obtenerFrasesPorDia();
 let escapeCount = 0;
 const maxEscapes = 5; // Cuántas veces escapa antes de dejarse atrapar
-
-// --- 2. MOTOR CINEMATOGRÁFICO Y BROMISTA ---
-document.addEventListener('DOMContentLoaded', () => {
-    initParticles(); animateParticles();
-
-    const fogLayer = document.getElementById('lima-fog');
-    const oasisStage = document.getElementById('oasis-stage');
-    const awakenBtn = document.getElementById('awaken-btn');
-    const zafiroCard = document.getElementById('zafiro-card');
-    const bromaBtn = document.getElementById('broma-btn');
-    const bromaStatus = document.getElementById('broma-status');
-    const finalMessage = document.getElementById('final-message');
-
-    // Despertar el Santuario
-    awakenBtn.addEventListener('click', () => {
-        document.getElementById('cursor-aura').style.opacity = '1';
-        fogLayer.style.opacity = '0';
-        setTimeout(() => fogLayer.style.display = 'none', 2500);
-        document.getElementById('network-canvas').style.opacity = '1';
-        oasisStage.classList.remove('hidden');
-    });
 
     // --- LÓGICA DE LA BROMITA FUGITIVA ---
     const handleEscape = (e) => {
@@ -408,59 +426,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ... (Todo el código del Efecto 3D anterior se mantiene igual) ...
-});
-
-// --- 3. EXPERIMENTOS: VOZ Y RITMO PIURANO ---
-document.addEventListener('DOMContentLoaded', () => {
-    // 3.1 Interacción por Voz (El Suspiro)
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.lang = 'es-ES';
-        recognition.interimResults = false;
-
-        recognition.onresult = (event) => {
-            const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
-            
-            if (transcript.includes('estoy cansada') || transcript.includes('cansada') || transcript.includes('suspiro')) {
-                const awakenBtn = document.getElementById('awaken-btn');
-                const fogLayer = document.getElementById('lima-fog');
-                
-                if(awakenBtn && fogLayer.style.display !== 'none') {
-                    // Triple intensidad en el brillo (Ráfaga)
-                    awakenBtn.style.boxShadow = '0 0 150px rgba(0, 229, 255, 1), 0 0 50px rgba(0, 229, 255, 0.8)';
-                    awakenBtn.style.transform = 'scale(1.3)';
-                    awakenBtn.style.background = 'var(--cyan-electric)';
-                    awakenBtn.innerText = 'Ráfaga Zafiro 💎';
-                    
-                    // Disipación instantánea y disparo
-                    setTimeout(() => {
-                        fogLayer.style.transition = 'all 0.3s ease-out'; 
-                        awakenBtn.click();
-                    }, 800);
-                }
-            }
-        };
-        
-        // Iniciar reconocimiento de forma invisible
-        try { recognition.start(); } catch(e) {}
-        
-        // Apagar el micro al disipar la neblina
-        document.getElementById('awaken-btn').addEventListener('click', () => {
-            if (recognition) recognition.stop();
-        });
-    }
-
-    // 3.2 Easter Egg de 'Ritmo Piurano' (3 rápidas, 2 lentas)
+    // --- EASTER EGG: Ritmo Piurano (3 Rápidas, 2 Lentas) ---
     let clickTimes = [];
     document.addEventListener('click', (e) => {
-        // Evitar el combo al dar click a botones o la carta
-        if(e.target.closest('button') || e.target.closest('.glass-card-3d')) return;
+        if(!e.target || e.target.closest('button') || e.target.closest('.glass-card-3d')) return;
 
-        clickTimes.push(Date.now());
+        const now = Date.now();
+        // Reiniciar si pasa más de 2 segundos desde el último clic
+        if (clickTimes.length > 0 && now - clickTimes[clickTimes.length - 1] > 2000) {
+            clickTimes = []; 
+        }
+
+        clickTimes.push(now);
         if (clickTimes.length > 5) clickTimes.shift();
 
         if (clickTimes.length === 5) {
@@ -469,14 +446,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 clickTimes[3] - clickTimes[2], clickTimes[4] - clickTimes[3]
             ];
 
-            // Rápidas: menos de 350ms | Lentas: entre 350ms y 1200ms
             const isFast = (t) => t < 350; 
             const isSlow = (t) => t >= 350 && t < 1200;
 
             if (isFast(diffs[0]) && isFast(diffs[1]) && isSlow(diffs[2]) && isSlow(diffs[3])) {
                 document.body.classList.add('festa-zafiro');
                 
-                // Mensaje Flotante
                 const msg = document.createElement('div');
                 msg.innerText = '¡Esa es la energía, socia! 🪩✨';
                 msg.className = 'floating-neon-msg';
@@ -484,18 +459,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 msg.style.top = `${e.clientY}px`;
                 document.body.appendChild(msg);
                 
-                setTimeout(() => msg.remove(), 4000); // Se borra luego de la animación
-                clickTimes = []; // Reset
+                setTimeout(() => msg.remove(), 4000);
+                clickTimes = [];
             }
         }
     });
-});
-
-// --- 4. BUZÓN ZAFIRO (Conexión con el Universo) ---
-document.addEventListener('DOMContentLoaded', () => {
-    const sendBtn = document.getElementById('send-btn');
-    const buzonInput = document.getElementById('buzon-input');
-    const moodBtns = document.querySelectorAll('.mood-btn');
     let selectedMood = '';
     let moodTimeout;
 
@@ -555,7 +523,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Feedback de Interfaz: Enviando
             const originalText = sendBtn.innerText;
+            sendBtn.innerText = "Enviando al cielo... ✨";
             sendBtn.disabled = true;
+            sendBtn.style.transform = 'scale(0.95)';
             sendBtn.style.opacity = '0.7';
 
             const webhookUrl = "https://discord.com/api/webhooks/1499446491419508947/Bp03dS7u2fOjF2fYDoke1eSqeV4s5w1u5FKuElm_lcUi6qWbIV7N3MpJZ-gbQixaq3rg";
@@ -590,6 +560,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Limpieza visual tras el envío
                     selectedMood = '';
                     moodBtns.forEach(b => b.classList.remove('selected'));
+                    document.body.classList.remove('mood-agradecida', 'mood-cansada', 'mood-bendecida', 'mood-chispa');
+                    particleSpeedModifier = 1;
+                    
+                    // Efecto de liberación (Partículas saltan)
+                    for(let p of particles) {
+                        p.vx = (Math.random() - 0.5) * 12;
+                        p.vy = (Math.random() - 0.5) * 12;
+                    }
                 } else {
                     throw new Error('Error en la petición');
                 }
@@ -603,9 +581,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 sendBtn.innerText = originalText;
                 sendBtn.disabled = false;
                 sendBtn.style.opacity = '1';
+                sendBtn.style.transform = 'none';
             }, 3000);
         });
     }
+
+    // --- INICIALIZACIÓN FINAL ---
+    initParticles(); 
+    animateParticles();
+    initDailyManna();
+    checkGraceMemory();
 });
 
 // --- 6. MEMORIA DE GRACIA ---
