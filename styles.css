@@ -233,34 +233,39 @@ body::before {
     margin-bottom: 12px;
     font-weight: 400;
 }
-
+/* --- ESTILO CAJITA MÁGICA --- */
 #buzon-input {
     width: 100%;
-    height: 70px;
-    background: rgba(255, 255, 255, 0.05);
+    min-height: 120px;
+    background: rgba(10, 25, 47, 0.4);
     border: 1px solid rgba(0, 229, 255, 0.2);
-    border-radius: 12px;
-    padding: 12px 15px;
+    border-radius: 15px;
+    padding: 15px;
     color: white;
     font-family: 'Montserrat', sans-serif;
     font-size: 0.9rem;
     resize: none;
     outline: none;
-    transition: all 0.5s ease;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     margin-bottom: 12px;
+    box-shadow: inset 0 12px 30px rgba(0, 0, 0, 0.8); /* Sombreado interno profundo */
+    caret-color: var(--sunset-orange); /* Color del cursor */
+    animation: alivePulse 4s infinite alternate ease-in-out; /* Borde vivo */
 }
 
-#buzon-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+#buzon-input::placeholder { 
+    color: rgba(255, 255, 255, 0.5); 
+}
 
 #buzon-input:focus {
-    border-color: var(--cyan-electric);
-    background: rgba(0, 229, 255, 0.08);
-    animation: calmNeonPulse 2s infinite alternate ease-in-out;
+    background: rgba(255, 255, 255, 0.12); /* Brillo al escribir */
+    border-color: var(--sunset-orange);
+    box-shadow: inset 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 209, 102, 0.2);
 }
 
-@keyframes calmNeonPulse {
-    0% { box-shadow: 0 0 10px rgba(0, 229, 255, 0.2), inset 0 0 5px rgba(0, 229, 255, 0.1); }
-    100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.5), inset 0 0 10px rgba(0, 229, 255, 0.3); }
+@keyframes alivePulse {
+    0% { border-color: rgba(0, 229, 255, 0.1); box-shadow: inset 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 5px rgba(0, 229, 255, 0.05); }
+    100% { border-color: rgba(0, 229, 255, 0.4); box-shadow: inset 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 229, 255, 0.2); }
 }
 
 .send-btn {
