@@ -139,32 +139,38 @@ document.addEventListener('DOMContentLoaded', () => {
     let recognition;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.lang = 'es-ES';
-        recognition.interimResults = false;
+        try {
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.lang = 'es-ES';
+            recognition.interimResults = false;
 
-        recognition.onresult = (event) => {
-            const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
-            if (transcript.includes('estoy cansada') || transcript.includes('cansada') || transcript.includes('suspiro')) {
-                if (awakenBtn && fogLayer && fogLayer.style.display !== 'none') {
-                    awakenBtn.style.boxShadow = '0 0 150px rgba(0, 229, 255, 1), 0 0 50px rgba(0, 229, 255, 0.8)';
-                    awakenBtn.style.transform = 'scale(1.3)';
-                    awakenBtn.style.background = 'var(--cyan-electric)';
-                    awakenBtn.innerText = 'Ráfaga Zafiro 💎';
-                    
-                    setTimeout(() => {
-                        fogLayer.style.transition = 'all 0.3s ease-out'; 
-                        awakenBtn.click();
-                    }, 800);
+            recognition.onresult = (event) => {
+                const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                if (transcript.includes('estoy cansada') || transcript.includes('cansada') || transcript.includes('suspiro')) {
+                    if (awakenBtn && fogLayer && fogLayer.style.display !== 'none') {
+                        awakenBtn.style.boxShadow = '0 0 150px rgba(0, 229, 255, 1), 0 0 50px rgba(0, 229, 255, 0.8)';
+                        awakenBtn.style.transform = 'scale(1.3)';
+                        awakenBtn.style.background = 'var(--cyan-electric)';
+                        awakenBtn.innerText = 'Ráfaga Zafiro 💎';
+                        
+                        setTimeout(() => {
+                            fogLayer.style.transition = 'all 0.3s ease-out'; 
+                            awakenBtn.click();
+                        }, 800);
+                    }
                 }
-            }
-        };
-        try { recognition.start(); } catch(e) {}
+            };
+            try { recognition.start(); } catch(e) { console.warn("Micro no iniciado:", e); }
+        } catch(err) {
+            console.warn("SpeechRecognition bloqueado por el WebView de Android:", err);
+        }
     }
 
     // Despertar el Santuario
-    awakenBtn.addEventListener('click', async () => {
+    const awakenHandler = async (e) => {
+        if (e && e.type === 'touchstart') e.preventDefault(); // Evitar doble ejecución en táctil
+
         // 1. Iniciar Audio y Aura
         bgMusic.volume = 0.5;
         bgMusic.play().catch(e => console.log("Audio autoplay bloqueado, requiere interacción."));
@@ -190,8 +196,15 @@ document.addEventListener('DOMContentLoaded', () => {
             claimBtn.classList.remove('hidden');
             claimBtn.style.opacity = 0;
             setTimeout(() => { claimBtn.style.opacity = 1; }, 500);
+
+            // Revelar mensaje secreto de identidad en el fondo
+            const identityMsg = document.getElementById('identity-secret-msg');
+            if (identityMsg) setTimeout(() => identityMsg.classList.add('reveal'), 2000);
         }, 2000);
-    });
+    };
+
+    awakenBtn.addEventListener('click', awakenHandler);
+    awakenBtn.addEventListener('touchstart', awakenHandler, { passive: false });
 
     // Efecto 3D de la tarjeta (Suavizado Extremo)
     const handleTilt = (clientX, clientY) => {
@@ -429,6 +442,17 @@ const maxEscapes = 5; // Cuántas veces escapa antes de dejarse atrapar
     // --- EASTER EGG: Ritmo Piurano (3 Rápidas, 2 Lentas) ---
     let clickTimes = [];
     document.addEventListener('click', (e) => {
+        // Ondas Expansivas (Ripple) al hacer clic en cualquier parte del fondo
+        if (e.target.id === 'network-canvas' || e.target.tagName === 'BODY') {
+            for(let p of particles) {
+                let dx = p.x - e.clientX; let dy = p.y - e.clientY;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if(dist < 150) {
+                    p.vx += (dx / dist) * 8; p.vy += (dy / dist) * 8;
+                }
+            }
+        }
+
         if(!e.target || e.target.closest('button') || e.target.closest('.glass-card-3d')) return;
 
         const now = Date.now();
@@ -468,10 +492,14 @@ const maxEscapes = 5; // Cuántas veces escapa antes de dejarse atrapar
     let moodTimeout;
 
     moodBtns.forEach(btn => {
+        // Efecto de sonido al pasar el mouse (hover)
+        btn.addEventListener('mouseenter', () => playTone(600, 'sine', 0.1, 0.02));
+        
         btn.addEventListener('click', () => {
             moodBtns.forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             selectedMood = btn.getAttribute('data-mood');
+            playTone(800, 'triangle', 0.2, 0.05); // Efecto de sonido al seleccionar
 
             // Mapeo de ánimos a las clases de animación en styles.css
             const moodClasses = {
@@ -514,6 +542,22 @@ const maxEscapes = 5; // Cuántas veces escapa antes de dejarse atrapar
             pIndex = (pIndex + 1) % placeholders.length;
             buzonInput.placeholder = placeholders[pIndex];
         }, 3500); // Rota el texto cada 3.5 segundos
+    }
+
+    // Easter Egg sorpresa al escribir palabras clave
+    if (buzonInput) {
+        buzonInput.addEventListener('input', (e) => {
+            const text = e.target.value.toLowerCase();
+            const secretMsg = document.getElementById('mensaje-secreto');
+            if (secretMsg) {
+                if (text.includes('socia') || text.includes('piura') || text.includes('yulexi')) {
+                    secretMsg.innerText = "¡Yo también te quiero, churre! 💛";
+                    secretMsg.classList.add('visible');
+                } else {
+                    secretMsg.classList.remove('visible');
+                }
+            }
+        });
     }
 
     if (sendBtn && buzonInput) {
@@ -564,6 +608,7 @@ const maxEscapes = 5; // Cuántas veces escapa antes de dejarse atrapar
                     particleSpeedModifier = 1;
                     
                     // Efecto de liberación (Partículas saltan)
+                    playTone(1200, 'sine', 0.6, 0.05); // Sonido celestial de envío
                     for(let p of particles) {
                         p.vx = (Math.random() - 0.5) * 12;
                         p.vy = (Math.random() - 0.5) * 12;
@@ -616,4 +661,29 @@ function checkGraceMemory() {
             historyMsg.innerText = `¿Recuerdas que anteriormente estabas agradecida por: "${lastText}"? Dios es fiel.`;
         }
     }
+}
+
+// --- 7. SINTETIZADOR DE SONIDO (Web Audio API) ---
+// ¡Crea sonidos mágicos sin necesidad de descargar archivos MP3!
+function playTone(freq, type = 'sine', duration = 0.3, vol = 0.1) {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!window.audioCtx) window.audioCtx = new AudioContext();
+        if (window.audioCtx.state === 'suspended') window.audioCtx.resume();
+        
+        const osc = window.audioCtx.createOscillator();
+        const gain = window.audioCtx.createGain();
+        
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, window.audioCtx.currentTime);
+        
+        gain.gain.setValueAtTime(vol, window.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(window.audioCtx.destination);
+        
+        osc.start();
+        osc.stop(window.audioCtx.currentTime + duration);
+    } catch(e) { console.log("Audio no soportado en este dispositivo"); }
 }

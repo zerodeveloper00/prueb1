@@ -75,7 +75,18 @@ body::before {
 .hidden { opacity: 0; pointer-events: none; transform: scale(1.1); filter: blur(15px); }
 
 /* Neblina */
-#lima-fog { background: rgba(200, 205, 210, 0.9); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); color: #333; text-align: center; z-index: 50; }
+#lima-fog { 
+    background: rgba(200, 205, 210, 0.9); 
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); 
+    color: #333; text-align: center; z-index: 50;
+    /* GRACEFUL DEGRADATION: Failsafe por si falla el JS en Android antiguo */
+    animation: failsafeFog 12s forwards ease-in-out;
+}
+
+@keyframes failsafeFog {
+    0%, 90% { opacity: 1; pointer-events: auto; }
+    100% { opacity: 0; pointer-events: none; display: none; }
+}
 
 .glitch-text { display: inline-block; transition: all 0.2s ease; }
 .glitch-text:hover { animation: elegantGlitch 0.3s linear infinite; }
